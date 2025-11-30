@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CSS Variable Color Squares</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .color-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 210px;
+      padding: 10px;
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+      box-sizing: border-box;
+    }
+
+    .color-square {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 8px;
+    }
+
+    .prop-name {
+      font-family: monospace;
+      font-size: 15px;
+      margin-bottom: 2px;
+      word-break: break-all;
+    }
+
+    .prop-value {
+      font-weight: bold;
+      font-family: monospace;
+      font-size: 15px;
+      color: #333;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <h1>CSS Variable Color Squares</h1>
+  <div id="color-container" class="container"></div>
+
+  <script>
+    const variables = [
+      { name: '--active-color', value: '#04AE93' },
+      { name: '--background-color', value: '#FFFFFF' },
+      { name: '--background-gradient-dark-purple', value: '#5D237A' },
+      { name: '--border-color', value: '#B2B2B2' },
+      { name: '--text-color', value: '#000000' },
+      { name: '--title-color', value: '#333333' },
+      { name: '--wp--preset--color--amber-100', value: '#FEF3C7' },
+      { name: '--wp--preset--color--amber-200', value: '#FDE68A' },
+      { name: '--wp--preset--color--amber-300', value: '#FCD34D' },
+      { name: '--wp--preset--color--amber-400', value: '#FBBF24' },
+      { name: '--wp--preset--color--amber-500', value: '#F59E0B' },
+      { name: '--wp--preset--color--amber-600', value: '#b37500' },
+      { name: '--wp--preset--color--amber-800', value: '#92400E' },
+      { name: '--wp--preset--color--amber-900', value: '#78350F' },
+      { name: '--wp--preset--color--black', value: '#000000' },
+      { name: '--wp--preset--color--blue-100', value: '#DBEAFE' },
+      { name: '--wp--preset--color--blue-500', value: '#3B82F6' },
+      { name: '--wp--preset--color--blue-800', value: '#1E40AF' },
+      { name: '--wp--preset--color--cyan-bluish-gray', value: '#abb8c3' },
+      { name: '--wp--preset--color--default-font-color', value: '#4B5563' },
+      { name: '--wp--preset--color--dimmed-font-color', value: '#8C929F' },
+      { name: '--wp--preset--color--gray-100', value: '#F3F4F6' },
+      { name: '--wp--preset--color--gray-200', value: '#E5E7Eb' },
+      { name: '--wp--preset--color--gray-300', value: '#D1D5DB' },
+      { name: '--wp--preset--color--gray-400', value: '#8C929F' },
+      { name: '--wp--preset--color--gray-50', value: '#F8F9FA' },
+      { name: '--wp--preset--color--gray-500', value: '#6B7280' },
+      { name: '--wp--preset--color--gray-600', value: '#4B5563' },
+      { name: '--wp--preset--color--gray-700', value: '#374151' },
+      { name: '--wp--preset--color--gray-800', value: '#1F2937' },
+      { name: '--wp--preset--color--gray-900', value: '#111827' },
+      { name: '--wp--preset--color--gray-950', value: '#030712' },
+      { name: '--wp--preset--color--green-100', value: '#DCFCE7' },
+      { name: '--wp--preset--color--green-500', value: '#22C55E' },
+      { name: '--wp--preset--color--green-600', value: '#13A047' },
+      { name: '--wp--preset--color--green-800', value: '#166534' },
+      { name: '--wp--preset--color--light-green-cyan', value: '#7bdcb5' },
+      { name: '--wp--preset--color--luminous-vivid-amber', value: '#fcb900' },
+      { name: '--wp--preset--color--luminous-vivid-orange', value: '#ff6900' },
+      { name: '--wp--preset--color--orange-red', value: '#DC3232' },
+      { name: '--wp--preset--color--pale-cyan-blue', value: '#8ed1fc' },
+      { name: '--wp--preset--color--pale-pink', value: '#f78da7' },
+      { name: '--wp--preset--color--purple-100', value: '#F3E5ED' },
+      { name: '--wp--preset--color--purple-200', value: '#EDCFE0' },
+      { name: '--wp--preset--color--purple-300', value: '#CD82AB' },
+      { name: '--wp--preset--color--purple-400', value: '#B94986' },
+      { name: '--wp--preset--color--purple-50', value: '#F9F1F6' },
+      { name: '--wp--preset--color--purple-500', value: '#A61E69' },
+      { name: '--wp--preset--color--purple-600', value: '#9A1660' },
+      { name: '--wp--preset--color--purple-700', value: '#8F0F57' },
+      { name: '--wp--preset--color--purple-800', value: '#83084E' },
+      { name: '--wp--preset--color--purple-900', value: '#770045' },
+      { name: '--wp--preset--color--red-100', value: '#FEE2E2' },
+      { name: '--wp--preset--color--red-500', value: '#EF4444' },
+      { name: '--wp--preset--color--red-800', value: '#991B1B' },
+      { name: '--wp--preset--color--rgba-black-0', value: 'rgba(0, 0, 0, 0)' },
+      { name: '--wp--preset--color--sky-blue-700', value: '#0369a1' },
+      { name: '--wp--preset--color--vivid-cyan-blue', value: '#0693e3' },
+      { name: '--wp--preset--color--vivid-green-cyan', value: '#00d084' },
+      { name: '--wp--preset--color--vivid-purple', value: '#9b51e0' },
+      { name: '--wp--preset--color--vivid-red', value: '#cf2e2e' },
+      { name: '--wp--preset--color--white', value: '#FFFFFF' },
+      { name: '--wp--preset--color--wp-blue', value: '#0073AA' },
+      { name: '--wp--preset--color--yoast-purple', value: '#A61E69' },
+      { name: '--yoast-color-active', value: '#6EA029' },
+      { name: '--yoast-color-active-light', value: '#B6CF94' },
+      { name: '--yoast-color-button-upsell', value: '#FEC228' },
+      { name: '--yoast-color-button-upsell-hover', value: '#F2AE01' },
+      { name: '--yoast-color-dark', value: '#303030' },
+      { name: '--yoast-color-default', value: '#404040' },
+      { name: '--yoast-color-default-darker', value: '#303030' },
+      { name: '--yoast-color-green', value: '#6EA029' },
+      { name: '--yoast-color-inactive', value: '#DC3232' },
+      { name: '--yoast-color-inactive-grey', value: '#9E9E9E' },
+      { name: '--yoast-color-inactive-grey-light', value: '#f1f1f1' },
+      { name: '--yoast-color-inactive-text', value: '#707070' },
+      { name: '--yoast-color-label', value: '#303030' },
+      { name: '--yoast-color-label-help', value: '#707070' },
+      { name: '--yoast-color-link', value: '#006dac' },
+      { name: '--yoast-color-placeholder', value: '#707070' },
+      { name: '--yoast-color-primary', value: '#a4286a' },
+      { name: '--yoast-color-primary-darker', value: '#7b1e50' },
+      { name: '--yoast-color-primary-lighter', value: '#F5D6E6' },
+      { name: '--yoast-color-sale', value: '#fec228' },
+      { name: '--yoast-color-sale-darker', value: '#feb601' },
+      { name: '--yoast-color-secondary', value: '#f7f7f7' },
+      { name: '--yoast-color-secondary-darker', value: '#d9d9d9' },
+      { name: '--yoast-color-white', value: '#fff' }
+    ];
+
+    const container = document.getElementById('color-container');
+
+    variables.forEach(v => {
+      const card = document.createElement('div');
+      card.className = 'color-card';
+
+      const square = document.createElement('div');
+      square.className = 'color-square';
+      square.style.backgroundColor = v.value;
+
+      const nameEl = document.createElement('div');
+      nameEl.className = 'prop-name';
+      nameEl.textContent = v.name;
+
+      const valueEl = document.createElement('div');
+      valueEl.className = 'prop-value';
+      valueEl.textContent = v.value;
+
+      card.appendChild(square);
+      card.appendChild(nameEl);
+      card.appendChild(valueEl);
+
+      container.appendChild(card);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Color Squares</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .color-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .color-square {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 6px;
+    }
+
+    .color-label {
+        font-family: monospace;
+        font-size: 14px; /* bigger size */
+        font-weight: bold; /* bold label */
+      }
+    </style>
+</head>
+<body>
+  <h1>Color Squares</h1>
+  <div id="color-container" class="container"></div>
+
+  <script>
+    // 👇 Put your hex color values here
+    const colors = [
+      "#FF5733",
+      "#33FF57",
+      "#3357FF",
+      "#FFD700",
+      "#800080",
+      "#00CED1",
+      "#000000",
+      "#FFFFFF",
+      "#121117",
+      "#006af5",
+      "#033c87",
+      "#0450b4",
+      "#052f66",
+      "#067560",
+      "#0d594b",
+      "#0e4037",
+      "#121117",
+      "#19ac91",
+      "#1c1b23",
+      "#2885fd",
+      "#302f3b",
+      "#3ddabe",
+      "#4d4c5c",
+      "#57a0ff",
+      "#63110d",
+      "#6a697c",
+      "#704c06",
+      "#760530",
+      "#7bead6",
+      "#880d07",
+      "#901443",
+      "#966208",
+      "#99c5ff",
+      "#a3120a",
+      "#a8a8b6",
+      "#b32357",
+      "#b4f3e7",
+      "#c5c5d1",
+      "#c9160d",
+      "#cce2ff",
+      "#d09c0b",
+      "#d13d76",
+      "#d8f8f2",
+      "#dcdce5",
+      "#ebebf1",
+      "#ebebf1",  
+      "#ebf3ff",
+      "#eefcfa",
+      "#f4f4f8",
+      "#f54238",
+      "#f6c823",
+      "#f87e77",
+      "#fdc2be",
+      "#fe9fc3",
+      "#ff7aac",
+      "#ffc2d9",
+      "#ffdbe9",
+      "#ffdf3d",
+      "#ffe2e0",
+      "#ffe875",
+      "#ffebf3",
+      "#ffeceb",
+      "#ffef9e",
+      "#fff",
+      "#fff5c2",
+      "#fffceb",
+    ];
+
+    const container = document.getElementById("color-container");
+
+    colors.forEach(hex => {
+      // Create wrapper
+      const card = document.createElement("div");
+      card.className = "color-card";
+
+      // Create the square
+      const square = document.createElement("div");
+      square.className = "color-square";
+      square.style.backgroundColor = hex;
+
+      // Label under the square
+      const label = document.createElement("div");
+      label.className = "color-label";
+      label.textContent = hex;
+
+      // Append elements
+      card.appendChild(square);
+      card.appendChild(label);
+      container.appendChild(card);
+    });
+  </script>
+</body>
+</html>

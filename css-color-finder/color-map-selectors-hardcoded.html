@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CSS Color Map Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .selector-block {
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .selector-title {
+      font-weight: bold;
+      margin-bottom: 12px;
+      font-family: monospace;
+    }
+
+    .cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .color-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 210px;
+      padding: 10px;
+      background: #fafafa;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      box-sizing: border-box;
+    }
+
+    .color-square {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 8px;
+      background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 50%, #ccc 50%, #ccc 75%, transparent 75%, transparent);
+      background-size: 8px 8px; /* checkerboard for transparent colors */
+    }
+
+    .color-square-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 7px;
+    }
+
+    .prop-name {
+      font-weight: bold;
+      font-family: monospace;
+      font-size: 13px;
+      margin-bottom: 2px;
+      word-break: break-all;
+    }
+
+    .prop-value {
+      font-family: monospace;
+      font-size: 13px;
+      color: #333;
+      word-break: break-all;
+    }
+
+    #app {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>CSS Color Map Viewer</h1>
+  <div id="app"></div>
+
+  <script>
+    // --- 1. Helpers from previous step: parsing CSS into a color map ---
+
+    function looksLikeColor(value) {
+      if (!value) return false;
+      value = value.trim().toLowerCase();
+
+      if (
+        /^#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(value) ||
+        /^rgba?\(/.test(value) ||
+        /^hsla?\(/.test(value)
+      ) {
+        return true;
+      }
+
+      const namedColors = new Set([
+        'black','white','red','green','blue','yellow','cyan','magenta',
+        'transparent','currentcolor','inherit','initial','revert','unset'
+      ]);
+
+      return namedColors.has(value);
+    }
+
+    function parseCssTextToColorMap(cssText) {
+      const styleEl = document.createElement('style');
+      styleEl.textContent = cssText;
+      document.head.appendChild(styleEl);
+
+      const sheet = [...document.styleSheets].find(
+        s => s.ownerNode === styleEl
+      );
+
+      const result = [];
+
+      for (const rule of sheet.cssRules) {
+        if (rule.type === CSSRule.STYLE_RULE) {
+          const selector = rule.selectorText;
+          const style = rule.style;
+          const colors = [];
+
+          for (let i = 0; i < style.length; i++) {
+            const propName = style[i];
+            const propValue = style.getPropertyValue(propName).trim();
+
+            // Keep all properties whose values look like colors
+            if (looksLikeColor(propValue)) {
+              colors.push({
+                name: propName,
+                value: propValue
+              });
+            }
+          }
+
+          if (colors.length > 0) {
+            result.push({ selector, colors });
+          }
+        }
+      }
+
+      document.head.removeChild(styleEl);
+      return result;
+    }
+
+    // --- 2. Rendering the color cards from the color map ---
+
+    function renderColorMap(colorMap, containerId = 'app') {
+      const app = document.getElementById(containerId);
+      app.innerHTML = '';
+
+      colorMap.forEach(block => {
+        const selectorBlock = document.createElement('div');
+        selectorBlock.className = 'selector-block';
+
+        const title = document.createElement('div');
+        title.className = 'selector-title';
+        title.textContent = block.selector;
+        selectorBlock.appendChild(title);
+
+        const cardsContainer = document.createElement('div');
+        cardsContainer.className = 'cards-container';
+
+        block.colors.forEach(color => {
+          const card = document.createElement('div');
+          card.className = 'color-card';
+
+          const square = document.createElement('div');
+          square.className = 'color-square';
+
+          const squareInner = document.createElement('div');
+          squareInner.className = 'color-square-inner';
+          squareInner.style.backgroundColor = color.value;
+
+          square.appendChild(squareInner);
+
+          const nameEl = document.createElement('div');
+          nameEl.className = 'prop-name';
+          nameEl.textContent = color.name;
+
+          const valueEl = document.createElement('div');
+          valueEl.className = 'prop-value';
+          valueEl.textContent = color.value;
+
+          card.appendChild(square);
+          card.appendChild(nameEl);
+          card.appendChild(valueEl);
+
+          cardsContainer.appendChild(card);
+        });
+
+        selectorBlock.appendChild(cardsContainer);
+        app.appendChild(selectorBlock);
+      });
+    }
+
+    // --- 3. Example usage: plug in your CSS here ---
+
+    const css = `
+    .table {
+        --bs-table-active-color: #212529;
+        --bs-table-hover-color: #212529;
+        --bs-table-striped-color: #212529;
+      }
+      .table-danger {
+        --bs-table-active-bg: #dfc2c4;
+        --bs-table-active-color: #000;
+        --bs-table-bg: #f8d7da;
+        --bs-table-hover-bg: #e5c7ca;
+        --bs-table-hover-color: #000;
+        --bs-table-striped-bg: #eccccf;
+        --bs-table-striped-color: #000;
+      }
+      .table-dark {
+        --bs-table-active-bg: #373b3e;
+        --bs-table-active-color: #fff;
+        --bs-table-bg: #212529;
+        --bs-table-hover-bg: #323539;
+        --bs-table-hover-color: #fff;
+        --bs-table-striped-bg: #2c3034;
+        --bs-table-striped-color: #fff;
+      }
+      .table-info {
+        --bs-table-active-bg: #badce3;
+        --bs-table-active-color: #000;
+        --bs-table-bg: #cff4fc;
+        --bs-table-hover-bg: #bfe2e9;
+        --bs-table-hover-color: #000;
+        --bs-table-striped-bg: #c5e8ef;
+        --bs-table-striped-color: #000;
+      }
+      .table-light {
+        --bs-table-active-bg: #dfe0e1;
+        --bs-table-active-color: #000;
+        --bs-table-bg: #f8f9fa;
+        --bs-table-hover-bg: #e5e6e7;
+        --bs-table-hover-color: #000;
+        --bs-table-striped-bg: #ecedee;
+        --bs-table-striped-color: #000;
+      }
+      .table-primary {
+        --bs-table-active-bg: #e4cac2;
+        --bs-table-active-color: #000;
+        --bs-table-bg: #fde0d8;
+        --bs-table-hover-bg: #eacfc8;
+        --bs-table-hover-color: #000;
+        --bs-table-striped-bg: #f0d5cd;
+        --bs-table-striped-color: #000;
+      }
+      .table-secondary {
+        --bs-table-active-bg: #cbccce;
+        --bs-table-active-color: #000;
+        --bs-table-bg: #e2e3e5;
+        --bs-table-hover-bg: #d1d2d4;
+        --bs-table-hover-color: #000;
+        --bs-table-striped-bg: #d7d8da;
+        --bs-table-striped-color: #000;
+      }
+      .table-success {
+        --bs-table-active-bg: #bcd0c7;
+        --bs-table-active-color: #000;
+        --bs-table-bg: #d1e7dd;
+        --bs-table-hover-bg: #c1d6cc;
+        --bs-table-hover-color: #000;
+        --bs-table-striped-bg: #c7dbd2;
+        --bs-table-striped-color: #000;
+      }
+      .table-warning {
+        --bs-table-active-bg: #e6dbb9;
+        --bs-table-active-color: #000;
+        --bs-table-bg: #fff3cd;
+        --bs-table-hover-bg: #ece1be;
+        --bs-table-hover-color: #000;
+        --bs-table-striped-bg: #f2e7c3;
+        --bs-table-striped-color: #000;
+      }
+      :root {
+        --bs-blue: #0d6efd;
+        --bs-body-bg: #fff;
+        --bs-body-color: #212529;
+        --bs-cyan: #0dcaf0;
+        --bs-danger: #dc3545;
+        --bs-dark: #212529;
+        --bs-gray: #6c757d;
+        --bs-gray-100: #f8f9fa;
+        --bs-gray-200: #e9ecef;
+        --bs-gray-300: #dee2e6;
+        --bs-gray-400: #ced4da;
+        --bs-gray-500: #adb5bd;
+        --bs-gray-600: #6c757d;
+        --bs-gray-700: #495057;
+        --bs-gray-800: #343a40;
+        --bs-gray-900: #212529;
+        --bs-gray-dark: #343a40;
+        --bs-green: #198754;
+        --bs-indigo: #6610f2;
+        --bs-info: #0dcaf0;
+        --bs-light: #f8f9fa;
+        --bs-orange: #45c5e1;
+        --bs-pink: #d63384;
+        --bs-primary: #45c5e1;
+        --bs-purple: #6f42c1;
+        --bs-red: #dc3545;
+        --bs-secondary: #6c757d;
+        --bs-success: #198754;
+        --bs-teal: #20c997;
+        --bs-warning: #ffc107;
+        --bs-white: #fff;
+        --bs-yellow: #ffc107;
+      }
+    `;
+
+    const colorMap = parseCssTextToColorMap(css);
+    console.log('Color map:', colorMap);
+
+    renderColorMap(colorMap);
+  </script>
+</body>
+</html>

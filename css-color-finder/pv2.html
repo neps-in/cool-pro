@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CSS Color Map Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    #controls {
+      max-width: 1200px;
+      margin: 0 auto 20px auto;
+    }
+
+    #css-input {
+      width: 100%;
+      box-sizing: border-box;
+      font-family: monospace;
+      font-size: 13px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      min-height: 200px;
+      resize: vertical;
+    }
+
+    #render-btn {
+      margin-top: 10px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #007bff;
+      background: #007bff;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #render-btn:hover {
+      background: #0069d9;
+    }
+
+    .selector-block {
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .selector-title {
+      font-weight: bold;
+      margin-bottom: 12px;
+      font-family: monospace;
+    }
+
+    .cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .color-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 210px;
+      padding: 10px;
+      background: #fafafa;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      box-sizing: border-box;
+    }
+
+    .color-square {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 8px;
+      background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 50%, #ccc 50%, #ccc 75%, transparent 75%, transparent);
+      background-size: 8px 8px; /* checkerboard for transparent colors */
+    }
+
+    .color-square-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 7px;
+    }
+
+    .prop-name {
+      font-weight: bold;
+      font-family: monospace;
+      font-size: 13px;
+      margin-bottom: 2px;
+      word-break: break-all;
+    }
+
+    .prop-value {
+      font-family: monospace;
+      font-size: 13px;
+      color: #333;
+      word-break: break-all;
+    }
+
+    #app {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>CSS Color Map Viewer</h1>
+
+  <!-- Textarea + button to input any CSS selectors and properties -->
+  <div id="controls">
+    <textarea id="css-input" placeholder="Write your CSS here..."></textarea>
+    <br />
+    <button id="render-btn">Render Colors</button>
+  </div>
+
+  <div id="app"></div>
+
+  <script>
+    // --- 1. Helpers: parsing CSS into a color map ---
+
+    function looksLikeColor(value) {
+      if (!value) return false;
+      value = value.trim().toLowerCase();
+
+      if (
+        /^#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(value) ||
+        /^rgba?\(/.test(value) ||
+        /^hsla?\(/.test(value)
+      ) {
+        return true;
+      }
+
+      const namedColors = new Set([
+        'black','white','red','green','blue','yellow','cyan','magenta',
+        'transparent','currentcolor','inherit','initial','revert','unset'
+      ]);
+
+      return namedColors.has(value);
+    }
+
+    function parseCssTextToColorMap(cssText) {
+      const styleEl = document.createElement('style');
+      styleEl.textContent = cssText;
+      document.head.appendChild(styleEl);
+
+      const sheet = [...document.styleSheets].find(
+        s => s.ownerNode === styleEl
+      );
+
+      const result = [];
+
+      for (const rule of sheet.cssRules) {
+        if (rule.type === CSSRule.STYLE_RULE) {
+          const selector = rule.selectorText;
+          const style = rule.style;
+          const colors = [];
+
+          for (let i = 0; i < style.length; i++) {
+            const propName = style[i];
+            const propValue = style.getPropertyValue(propName).trim();
+
+            // Keep all properties whose values look like colors
+            if (looksLikeColor(propValue)) {
+              colors.push({
+                name: propName,
+                value: propValue
+              });
+            }
+          }
+
+          if (colors.length > 0) {
+            result.push({ selector, colors });
+          }
+        }
+      }
+
+      document.head.removeChild(styleEl);
+      return result;
+    }
+
+    // --- 2. Rendering the color cards from the color map ---
+
+    function renderColorMap(colorMap, containerId = 'app') {
+      const app = document.getElementById(containerId);
+      app.innerHTML = '';
+
+      colorMap.forEach(block => {
+        const selectorBlock = document.createElement('div');
+        selectorBlock.className = 'selector-block';
+
+        const title = document.createElement('div');
+        title.className = 'selector-title';
+        title.textContent = block.selector;
+        selectorBlock.appendChild(title);
+
+        const cardsContainer = document.createElement('div');
+        cardsContainer.className = 'cards-container';
+
+        block.colors.forEach(color => {
+          const card = document.createElement('div');
+          card.className = 'color-card';
+
+          const square = document.createElement('div');
+          square.className = 'color-square';
+
+          const squareInner = document.createElement('div');
+          squareInner.className = 'color-square-inner';
+          squareInner.style.backgroundColor = color.value;
+
+          square.appendChild(squareInner);
+
+          const nameEl = document.createElement('div');
+          nameEl.className = 'prop-name';
+          nameEl.textContent = color.name;
+
+          const valueEl = document.createElement('div');
+          valueEl.className = 'prop-value';
+          valueEl.textContent = color.value;
+
+          card.appendChild(square);
+          card.appendChild(nameEl);
+          card.appendChild(valueEl);
+
+          cardsContainer.appendChild(card);
+        });
+
+        selectorBlock.appendChild(cardsContainer);
+        app.appendChild(selectorBlock);
+      });
+    }
+
+    // --- 3. Use textarea value to populate `css` and render ---
+
+    let css = ''; // this will be populated from the textarea
+
+    function updateFromTextarea() {
+      const textarea = document.getElementById('css-input');
+      css = textarea.value; // ✅ populate the css variable with textarea value
+      const colorMap = parseCssTextToColorMap(css);
+      console.log('Color map:', colorMap);
+      renderColorMap(colorMap);
+    }
+
+    // set an initial example CSS in the textarea (optional)
+    const exampleCss = `
+    .table {
+      --bs-table-active-color: #212529;
+      --bs-table-hover-color: #212529;
+      --bs-table-striped-color: #212529;
+    }
+    .table-danger {
+      --bs-table-active-bg: #dfc2c4;
+      --bs-table-active-color: #000;
+      --bs-table-bg: #f8d7da;
+      --bs-table-hover-bg: #e5c7ca;
+      --bs-table-hover-color: #000;
+      --bs-table-striped-bg: #eccccf;
+      --bs-table-striped-color: #000;
+    }
+    :root {
+      --bs-blue: #0d6efd;
+      --bs-body-bg: #fff;
+      --bs-body-color: #212529;
+      --bs-primary: #45c5e1;
+      --bs-warning: #ffc107;
+    }
+    `;
+    document.getElementById('css-input').value = exampleCss.trim();
+
+    document.getElementById('render-btn').addEventListener('click', updateFromTextarea);
+
+    // initial render with the example CSS
+    updateFromTextarea();
+  </script>
+</body>
+</html>
