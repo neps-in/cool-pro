@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Open Projects | PutForShare Labs</title>
+
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-elevated: #0b1120;
+      --card-bg: #020617;
+      --card-border: #1f2937;
+      --accent: #fbbf24;
+      --accent-soft: rgba(251, 191, 36, 0.18);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --pill-bg: #1d4ed8;
+      --pill-text: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #1d283a 0, #020617 55%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1100px;
+      margin: 24px;
+      padding: 20px 24px 32px;
+      background: var(--bg-elevated);
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.75);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header */
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-block img {
+      width: 40px;
+      height: 40px;
+      border-radius: 5px;
+      background: #fff;
+    }
+
+    .logo-text-main {
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.03em;
+    }
+
+    .logo-text-sub {
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+
+    .header-right {
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Breadcrumb */
+
+    .breadcrumb {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .breadcrumb a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    .breadcrumb-sep {
+      margin: 0 4px;
+      opacity: 0.7;
+    }
+
+    /* Intro section */
+
+    .intro {
+      margin-top: 4px;
+    }
+
+    .intro h1 {
+      margin: 10px 0 4px;
+      font-size: 1.4rem;
+    }
+
+    .intro p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* Cards grid */
+
+    .cards {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      position: relative;
+      background: var(--card-bg);
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
+      padding: 16px 16px 14px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.6);
+      overflow: hidden;
+      transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease,
+        background 0.18s ease;
+      cursor: pointer;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at top left,
+        var(--accent-soft),
+        transparent 55%
+      );
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      pointer-events: none;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+      border-color: rgba(251, 191, 36, 0.5);
+      background: #020617;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-type-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: rgba(37, 99, 235, 0.1);
+      color: var(--pill-text);
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .card-description {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      text-decoration: none;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .card-link span {
+      font-size: 0.8rem;
+    }
+
+    .card-link:hover span {
+      text-decoration: underline;
+    }
+
+    .tag {
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.15);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        margin: 14px;
+        padding: 16px 16px 24px;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-right {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <!-- Header with PutForShare logo + Labs -->
+    <header class="header">
+      <div class="logo-block">
+        <!-- If you want to use your real logo, replace src with your logo URL -->
+        <a href="https://putforshare.com" target="_blank" rel="noopener">
+          <img
+            src="https://putforshare.com/wp-content/uploads/2022/07/pfs-logo-svg-bg-transperant.svg"
+            alt="PutForShare Logo"
+          />
+        </a>
+        <div>
+          <div class="logo-text-main">PutForShare Labs</div>
+          <div class="logo-text-sub">Open Source Initiative from PutForShare Lab</div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        Cool Hacks, utilities under <strong>/open/</strong><br />
+        Useful and Safe to play with.
+      </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Open Projects</span>
+    </nav>
+
+    <!-- Intro -->
+    <section class="intro">
+      <h1>Collection of Open Projects, Hacks.</h1>
+      <p>
+        A collection of small tools and experiments built by the PutForShare tech
+        team — useful for debugging, design, and engineering workflows.
+      </p>
+    </section>
+
+    <!-- Cards Grid -->
+    <section class="cards">
+      <!-- Project 1: CSS Color Finder -->
+      <article
+        class="card"
+        onclick="window.location.href='./css-color-finder/index.html';"
+      >
+        <div class="card-type-pill">
+          <span>🎨 Tool</span>
+          <span>Color & CSS</span>
+        </div>
+        <div class="card-title">CSS Color Finder</div>
+        <div class="card-description">
+          Paste CSS and instantly visualize all colors used — grouped by selectors,
+          inline properties, and raw values.
+        </div>
+        <div class="card-footer">
+          <span class="tag">Status: Active</span>
+          <a class="card-link" href="./css-color-finder/index.html">
+            <span>Open Tool</span> <span>↗</span>
+          </a>
+        </div>
+      </article>
+
+      <!-- Project 2 placeholder -->
+      <!-- <article class="card" onclick="window.location.href='./coming-soon.html';">
+        <div class="card-type-pill">
+          <span>🧪 Tool</span>
+          <span>Coming Soon</span>
+        </div>
+        <div class="card-title">Comming soon</div>
+        <div class="card-description">
+          Planned: paste server logs and quickly filter, group, and visualize
+          errors, endpoints, and response times.
+        </div>
+        <div class="card-footer">
+          <span class="tag">Status: Planned</span>
+          <a class="card-link" href="./coming-soon.html">
+            <span>Details</span> <span>↗</span>
+          </a>
+        </div>
+      </article> -->
+
+      <!-- Project 3 placeholder -->
+      <!-- <article class="card" onclick="window.location.href='./coming-soon.html';">
+        <div class="card-type-pill">
+          <span>⚙️ Utility</span>
+          <span>Internal</span>
+        </div>
+        <div class="card-title">JSON Formatter & Diff</div>
+        <div class="card-description">
+          Planned: a quick playground to prettify, compare, and validate JSON
+          payloads for APIs and webhooks.
+        </div>
+        <div class="card-footer">
+          <span class="tag">Status: Planned</span>
+          <a class="card-link" href="./coming-soon.html">
+            <span>Details</span> <span>↗</span>
+          </a>
+        </div>
+      </article>-->
+    </section>
+  </div>
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>CSS Color Map Viewer</title>
+  <title>CSS Color Map Viewer | PutForShare Open Source Initiative </title>
   <style>
     /* Remove ALL white space from the page edges */
     html, body {
@@ -18,7 +18,7 @@
     }
 
     /* === Full width brand header === */
-    header {
+    /* header {
       width: 100%;
       background: #6c590e;
       color: white;
@@ -27,8 +27,38 @@
       gap: 20px;
       padding: 12px 30px;
       box-sizing: border-box;
+    } */
+    
+    header {
+      width: 100%;
+      background: #6c590e;
+      color: white;
+      display: flex;
+      justify-content: space-between; /* New: space items left & right */
+      align-items: center;
+      gap: 20px;
+      padding: 12px 30px;
+      box-sizing: border-box;
     }
-  
+    
+    .back-btn {
+      margin-left: auto;
+      background: #ffffff22;
+      color: #fff;
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid #ffffff55;
+      transition: 0.3s ease;
+    }
+    
+    .back-btn:hover {
+      background: #ffffff44;
+      border-color: white;
+    }
+    
     header img {
       height: 48px;
       width: 48px;
@@ -286,11 +316,13 @@
 </head>
 <body>
   <header>
-    <img src="https://putforshare.com/wp-content/uploads/2022/07/pfs-logo-svg-bg-transperant.svg" alt="Logo" />
+    <img src="/pfs-logo-svg-bg-transperant.svg" alt="Logo" />
     <div class="brand-text">
       <div class="brand-title">PutForShare.com</div>
       <div class="brand-tagline">Open Source Initiatives</div>
     </div>
+    <a href="https://open.putforshare.com" class="back-btn">Back</a>
+
   </header>
   
   <div id="content-wrapper">
